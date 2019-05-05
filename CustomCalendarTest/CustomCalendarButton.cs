@@ -24,6 +24,24 @@ namespace CustomCalendarTest
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomCalendarButton), new FrameworkPropertyMetadata(typeof(CustomCalendarButton)));
         }
 
+        public CustomCalendarButton() { }
+
+        public CustomCalendarButton(CustomCalendar ownerCalendar) : this() {
+            Owner = ownerCalendar;
+        }
+
+        /// <summary>
+        /// 此控件的 父日历控件
+        /// </summary>
+        public CustomCalendar Owner { get; private set; }
+
+        protected override void OnClick() {
+            base.OnClick();
+
+            if (Owner == null)
+                return;
+        }
+
         #region 作为标志的 依赖属性
 
         /// <summary>
@@ -88,16 +106,70 @@ namespace CustomCalendarTest
 
         // Using a DependencyProperty as the backing store for Date.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DateProperty =
-            DependencyProperty.Register("Date", typeof(DateTime), typeof(CustomCalendarButton), new PropertyMetadata(DateTime.Now, DatePropertyChanged);
+            DependencyProperty.Register("Date", typeof(DateTime), typeof(CustomCalendarButton), new PropertyMetadata(DateTime.Now, DatePropertyChanged));
 
         private static void DatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             if (!(d is CustomCalendarButton))
                 return;
 
-            var cbtn = d as CustomCalendarButton;
+            (d as CustomCalendarButton).UpdateContent();
+        }
+
+        /// <summary>
+        /// 按钮显示模式
+        /// </summary>
+        public CalendarButtonDisplayMode DisplayMode {
+            get { return (CalendarButtonDisplayMode)GetValue(DisplayModeProperty); }
+            set { SetValue(DisplayModeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DisplayMode.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DisplayModeProperty =
+            DependencyProperty.Register("DisplayMode", typeof(CalendarButtonDisplayMode), typeof(CustomCalendarButton), new PropertyMetadata(CalendarButtonDisplayMode.Date, DisplayModePropertyChanged));
+
+        private static void DisplayModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            if (!(d is CustomCalendarButton))
+                return;
+
+            (d as CustomCalendarButton).UpdateContent();
+        }
+
+        private void UpdateContent() {
+            switch (DisplayMode) {
+                case CalendarButtonDisplayMode.Date:
+                    Content = Date.Day;
+                    break;
+                case CalendarButtonDisplayMode.Mouth:
+                    Content = Date.Month;
+                    break;
+                case CalendarButtonDisplayMode.Year:
+                    Content = Date.Year;
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion
 
+    }
+
+    /// <summary>
+    /// 日期控件按钮 的日期模式
+    /// </summary>
+    public enum CalendarButtonDisplayMode
+    {
+        /// <summary>
+        /// 日期
+        /// </summary>
+        Date = 0,
+        /// <summary>
+        /// 月份
+        /// </summary>
+        Mouth = 1,
+        /// <summary>
+        /// 年份
+        /// </summary>
+        Year = 2
     }
 }
