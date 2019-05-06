@@ -329,6 +329,8 @@ namespace CustomCalendarTest
             if (mGridDay != null) {
                 var firstDate = new DateTime(DisplayDate.Year, DisplayDate.Month, 1);
                 var preDayCount = (int)firstDate.DayOfWeek - (int)cFirstDayOfWeek;
+                if (preDayCount < 0)
+                    preDayCount += 7;
                 firstDate -= new TimeSpan(preDayCount, 0, 0, 0);
                 for (int i = 0; i < mDayBtnList.Count; i++) {
                     var btn = mDayBtnList[i];
